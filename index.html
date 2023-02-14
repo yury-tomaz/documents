@@ -1,0 +1,461 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {}
+        }
+      }
+    }
+  </script>
+  <script>
+    // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+    if(localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html,body{ min-height: 100vh; }
+    button,a,[onclick],.pointer{
+      cursor: pointer;
+    }
+    /* BEGIN:: HANDLE SCROLL =================================== */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: theme('colors.gray.200');
+      border-radius: 20px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: theme('colors.gray.400');
+      border-radius: 20px;
+    }
+    /* END:: HANDLE SCROLL ==========================+========= */
+  </style>
+</head>
+<body class="dark p-0 m-0">
+  <div class="bg-white dark:bg-slate-900 min-h-screen py-10">
+    <div class="container mx-auto px-4">
+      <div class="relative">
+        <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
+          Workflow Modular
+        </h1>
+        <p class="mb-6 text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400">
+          Documentação do gerador de configurações de workflow.
+        </p>
+
+
+        <button 
+          type="button"
+          class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 absolute top-0 right-0"
+          onClick="handleToggleDarkMode()"
+        >
+          <svg
+            aria-hidden="true"
+            id="theme-toggle-dark-icon"
+            class="w-5 h-5 dark:hidden"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          ><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg
+            aria-hidden="true"
+            id="theme-toggle-light-icon"
+            class="w-5 h-5 hidden dark:block"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          ><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+        </button>
+      </div>
+
+      <div>
+        <p class="mb-4 font-normal text-gray-500 dark:text-gray-400">
+          Os workflows dinâmicos terão sua configuração definida por arquivos json descritos na estrutura a seguir, onde as ordens de etapas, conteúdos e regras são definidas pelo usuário.
+        </p>
+
+        <div class="text-xs font-mono text-gray-500 dark:text-gray-400 border border-gray-500 rounded-lg p-3 mb-6">
+          <span>&lt;nome_do_módulo&gt;</span><br/>
+          ---------------- <span>&lt;etapa.json&gt;</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex flex-col lg:flex-row gap-4">
+          <div class="relative overflow-x-auto" id="table-step">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <thead class="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  <th scope="col" class="px-6 py-3" colspan="2">
+                    <span class="uppercase">Step</span><br/>
+                    <p class="text-xs font-medium">Etapa do módulo</p>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                  <td colspan="2" class="text-center p-4">
+                    <div role="status">
+                      <svg aria-hidden="true" class="inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 dark:fill-gray-50" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                      </svg>
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+  
+          <div>
+            <div class="relative overflow-x-auto mb-4" id="table-step-rules">
+              <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" class="px-6 py-3" colspan="2">
+                      <span class="uppercase">Step / Rules</span><br/>
+                      <p class="text-xs font-medium">Regras para conclusão da etapa</p>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <td colspan="2" class="text-center p-4">
+                      <div role="status">
+                        <svg aria-hidden="true" class="inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 dark:fill-gray-50" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                          <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                        </svg>
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+    
+            <div class="relative overflow-x-auto my-4" id="table-step-actions">
+              <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" class="px-6 py-3" colspan="2">
+                      <span class="uppercase">Step / Actions</span><br/>
+                      <p class="text-xs font-medium">
+                        Ações para definir os destinos possíveis de uma etapa<br/>(como aprovar e reprovar, que são dois destinos diferentes).
+                      </p>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <td colspan="2" class="text-center p-4">
+                      <div role="status">
+                        <svg aria-hidden="true" class="inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 dark:fill-gray-50" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                          <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                        </svg>
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative overflow-x-auto mb-4 lg:mt-4" id="table-step-items">
+          <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" class="px-6 py-3" colspan="2">
+                  <span class="uppercase">Step / Items</span><br/>
+                  <p class="text-xs font-medium">
+                    Itens da Etapa
+                  </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <td colspan="2" class="text-center p-4">
+                  <div role="status">
+                    <svg aria-hidden="true" class="inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 dark:fill-gray-50" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                      <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                    </svg>
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+  <script>
+    const colorsDefault = [
+      `<span class="bg-blue-500 text-white px-1 rounded">primary</span>`,
+      `<span class="bg-green-500 text-white px-1 rounded">success</span>`,
+      `<span class="bg-gray-200 text-gray-800 px-1 rounded">light</span>`,
+      `<span class="bg-red-500 text-white px-1 rounded">danger</span>`,
+      `<span class="bg-yellow-500 text-white px-1 rounded">warning</span>`,
+      `<span class="bg-blue-300 text-white px-1 rounded">info</span>`
+    ];
+
+    function handleToggleDarkMode(){
+      if($('body').hasClass('dark')){
+        localStorage.setItem('theme', 'light');
+        $('body').removeClass('dark')
+      }else{
+        localStorage.setItem('theme', 'dark');
+        $('body').addClass('dark')
+      }
+    }
+
+
+    $(function(){
+      initTableSteps();
+      initTableStepRules();
+      initTableStepActions();
+      initTableStepItems();
+    });
+    
+    function initTableSteps(){
+      const id = '#table-step';
+      $(`${id} tbody`).html('');
+
+      let attributes = [{
+        key: 'slug',
+        description: 'Nome do arquivo JSON da etapa'
+      },{
+        key: 'name',
+        description: 'Nome da etapa'
+      },{
+        key: 'title',
+        description: 'Título que será exibido no formulário ou tela, renderizado pela etapa'
+      },{
+        key: 'type',
+        description: `
+          Tipo de formulário que será renderizado. Tipos válidos:
+          <div class="mt-1">
+            - <b>slide-over:</b> Modal lateral<br/>
+            - <b>page:</b> Página exclusiva para a etapa
+          </div>
+        `
+      },{
+        key: 'index',
+        description: 'Indice da ordem em que a etapa se encontra no fluxo'
+      },{
+        key: 'target',
+        description: `
+          Slug da etapa seguinte.<br/>
+          Opcional quando houver mais de um destino diferente, e nesse caso, invés de target, 
+          teremos <a href="#table-step-actions" class="underline text-blue-500">Actions</a> que mostrará os destinos possíveis, ou quando for a etapa final, que não possuirá destino.`,
+        nullable: true
+      },{
+        key: 'rules',
+        description: `
+          Regras para que a etapa seja satisfeita, e possa avançar para a próxima etapa
+          <a href="#table-step-rules" class="block underline text-blue-500">Step / Rules</a>
+        `,
+        nullable: true
+      },{
+        key: 'action_button',
+        description: `
+          Objeto de configuração do botão de finalizar etapa.<br/>
+          Obrigatório apenas quando houver target, pois quando não existir, ou será a etapa final(e não terá botão de ação), ou a configuração dos botões de finalização estará em actions.<br/><br/>
+          Propriedades do objeto:<br/>
+          - <b>label:</b> Título que aparece no botão<br/>
+          - <b>type:</b> Tema de cor do botão<br/>
+          &nbsp;&nbsp;${colorsDefault.join('<br/>&nbsp;&nbsp;')}
+        `,
+        nullable: true
+      },{
+        key: 'actions',
+        description: `
+          Array de múltiplos destinos (apontamento para mais de uma etapa)
+          <a href="#table-step-actions" class="block underline text-blue-500">Step / Actions</a>
+        `,
+        nullable: true
+      },{
+        key: 'items',
+        description: `
+          Array de itens da etapa.<br/>
+          Geralmente opcional quando a etapa possui multiplos destinos(como uma etapa de aprovação), e não há necessidade de adicionar nenhuma informação adicional além do destino escolhido.
+          <a href="#table-step-items" class="block underline text-blue-500">Step / Items</a>
+        `,
+        nullable: true
+      }];
+
+      attributes.forEach((attr) => $(`${id} tbody`).append(renderTr(attr)));
+    }
+    function initTableStepRules(){
+      const id = '#table-step-rules';
+      $(`${id} tbody`).html('');
+
+      let attributes = [{
+        key: 'requireds',
+        description: 'Array com a chave dos items obrigatórios para conclusão da etapa'
+      }]
+      attributes.forEach((attr) => $(`${id} tbody`).append(renderTr(attr)));
+    }
+    function initTableStepActions(){
+      const id = '#table-step-actions';
+      $(`${id} tbody`).html('');
+
+      let attributes = [{
+        key: 'label',
+        description: 'Título que aparece no botão'
+      },{
+        key: 'type',
+        description: `
+          Tema de cor do botão:<br/>
+          ${colorsDefault.join('<br/>')}
+        `,
+      },{
+        key: 'key',
+        description: `
+          Chave para usar de referencia do botão.<br/>
+          Caso seja uma propriedade encadeada use o separador '/' para informar a key do item pai, e depois a sua própria key<br/>
+          <span class="text-xs">(ex. key-pai/key-filho)</span>
+        `
+      },{
+        key: 'target',
+        description: `
+          Slug da etapa para qual irá redirecionar<br/>
+          Obrigatório quando não há confirmação
+        `,
+        nullable: true
+      },{
+        key: 'confirm',
+        description: `
+          Confirmar ação. Estrutura semelhante ao json da etapa com:<br/>
+          - title (título que aparece no modal de confirmação)<br/>
+          - target<br/>
+          - rules<br/>
+          - items (caso queira adicionar algum input à confirmação. Mesmo padrão de <a href="#table-step-items" class="underline text-blue-500">Step / Items</a>)<br/>
+          - actions (configuração dos botões de confirmação. Mesmo padrão de <a href="#table-step-items" class="underline text-blue-500">Step / Actions</a>, porém os botões terão a prop boleana <b>confirmation</b>, que retornará se a confirmação foi aceita ou negada)
+        `,
+        nullable: true
+      }]
+      attributes.forEach((attr) => $(`${id} tbody`).append(renderTr(attr)));
+    }
+    function initTableStepItems(){
+      const id = '#table-step-items';
+      $(`${id} tbody`).html('');
+
+      let attributes = [{
+        key: 'key',
+        description: `
+          Chave para usar de referencia do item.<br/>
+          Caso seja uma propriedade encadeada use o separador '/' para informar a key do item pai, e depois a sua própria key<br/>
+          <span class="text-xs">(ex. key-pai/key-filho)</span>
+        `
+      },{
+        key: 'type',
+        description: `
+          Tipo do item. Tipos válidos:<br/>
+          - <b>text:</b><br/>
+          - <b>textarea:</b><br/>
+          - <b>select:</b><br/>
+          - <b>select-multiple:</b><br/>
+          - <b>radio:</b><br/>
+          - <b>checkbox:</b><br/>
+          - <b>file:</b><br/>
+          - <b>file-multiple:</b><br/>
+          - <b>group-collapse:</b><br/>
+        `
+      },{
+        key: 'mask',
+        description: `
+          Máscara de input. Máscaras válidas:<br/>
+          - <b>email:</b> <br/>
+          - <b>moeda:</b> <br/>
+          - <b>cpf:</b> <br/>
+          - <b>cnpj:</b> <br/>
+          - <b>cpf-cnpj:</b> <br/>
+          - <b>cep:</b> <br/>
+        `,
+        nullable: true
+      },{
+        key: 'label',
+        description: 'Label do input',
+        nullable: true
+      },{
+        key: 'placeholder',
+        description: 'Placeholder do input',
+        nullable: true
+      },{
+        key: 'options',
+        description: `
+          Array de objetos com as opções do input. Usado quando type igual a select, select-multiple, radio ou checkbox. Formato do objeto:<br/>
+          - <b>value:</b> Valor interno da opção do input<br/>
+          - <b>name:</b> Valor mostrado na opção o input
+        `,
+        nullable: true
+      },{
+        key: 'required',
+        description: `
+          Boleano de campo obrigatório ou não.<br/>
+          <span class="text-xs">
+            Obs. O required do Step/Item é apenas uma verficação para envio do formulário.<br/>
+            A verificação para progressão do step está em Step.rules, com isso, o Step/Item pode ser required = false (ou seja, pode enviar o formulário com o campo vazio), porém o mesmo campo pode estar no required do Step.rules, e sendo assim, o step só pregredirá quando o campo for preenchido.
+          </span>
+        `,
+        nullable: true
+      },{
+        key: 'rules',
+        description: `
+          Objeto com regras, exemplo minLen, maxLen, regex, etc.<br/>
+          <em class="text-xs"> -- formato não definido -- </em>
+        `,
+        nullable: true
+      },{
+        key: 'items',
+        description: `
+          Obrigatório quando type = group-collapse.<br/>
+          Itens no formato de <a href="#table-step-items" class="underline text-blue-500">Step / Items</a>
+        `,
+        nullable: true
+      }]
+      attributes.forEach((attr) => $(`${id} tbody`).append(renderTr(attr)));
+    }
+    function renderTr(attr){
+      return `
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+          <th scope="row" class="p-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            ${attr.key} ${attr.nullable ? `<span class="text-gray-500 dark:text-gray-400 text-xs">(opcional)</span>` : ''}
+          </th>
+          <td class="p-2 pr-3">${attr.description}</td>
+        </tr>
+      `;
+    }
+  </script>
+</body>
+</html>
