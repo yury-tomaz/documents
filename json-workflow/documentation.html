@@ -94,6 +94,7 @@
         </div>
       </div>
 
+      <!-- BEGIN:: TABLES -->
       <div>
         <div class="flex flex-col lg:flex-row gap-4">
           <div class="relative overflow-x-auto" id="table-step">
@@ -178,7 +179,7 @@
             </div>
           </div>
         </div>
-
+        
         <div class="relative overflow-x-auto mb-4 lg:mt-4" id="table-step-items">
           <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
             <thead class="text-xs text-gray-700 bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
@@ -207,7 +208,18 @@
           </table>
         </div>
       </div>
+      <!-- END:: TABLES -->
 
+      <div class="mt-8">
+        <h2 class="text-xl mb-2 font-bold leading-none tracking-tight text-gray-900 lg:text-2xl dark:text-white">Features</h2>
+        <ul class="space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400 text-sm">
+          <li>Widgets</li>
+          <li>Integrações com APIs externas</li>
+          <li>Definir padrão de Step/Items.rules</li>
+          <li>Adicionar tratamento para datalist, com a posibilidade da lista ser carregada por url de api ou com dados previamente cadastrados</li>
+          <li>configurações de autopreenchimento. Exemplo: quando preencher o CEP adicionar resultado a tais campos.</li>
+        </ul>
+      </div>
     </div>
   </div>
   <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
@@ -373,26 +385,32 @@
         key: 'type',
         description: `
           Tipo do item. Tipos válidos:<br/>
-          - <b>text:</b><br/>
-          - <b>textarea:</b><br/>
-          - <b>select:</b><br/>
-          - <b>select-multiple:</b><br/>
-          - <b>radio:</b><br/>
-          - <b>checkbox:</b><br/>
-          - <b>file:</b><br/>
-          - <b>file-multiple:</b><br/>
-          - <b>group-collapse:</b><br/>
+          - <b>text:</b> Input de texto<br/>
+          Neste tipo é possível adicionar máscaras de formatação, como cpf, cep, money, etc.<br/>
+          - <b>textarea:</b> Textarea<br/><br/>
+
+          [* nos campos a seguir é obrigatório informar o campo <em>options</em>]<br/>
+          - <b>select:</b> Select<br/>
+          - <b>select-multiple:</b> Select de Múltipla escolha<br/>
+          - <b>radio:</b> Input do tipo radio(apenas um escolha)<br/>
+          - <b>checkbox:</b> Input do tipo checkbox(multipla escolha) <br/>
+          [* fim]<br/><br/>
+        
+          - <b>file:</b> Input do tipo file<br/>
+          - <b>file-multiple:</b> Input de múltiplos arquivos<br/>
+          - <b>group-collapse:</b> Agrupamento de formulário<br/>
+          Este tipo agrupa campos e inicia por padrão colapsado, com a opção de intercalação. É ideal que os campos dentro deste agrupamento sejam opcionais. 
         `
       },{
         key: 'mask',
         description: `
           Máscara de input. Máscaras válidas:<br/>
-          - <b>email:</b> <br/>
-          - <b>moeda:</b> <br/>
-          - <b>cpf:</b> <br/>
-          - <b>cnpj:</b> <br/>
-          - <b>cpf-cnpj:</b> <br/>
-          - <b>cep:</b> <br/>
+          - <b>email:</b> Máscara de email [*****@***.**]<br/>
+          - <b>money:</b> Máscara de valor em dinheiro [R$ **.***,**]<br/>
+          - <b>cpf:</b> Máscara de CPF [***.***.***-**]<br/>
+          - <b>cnpj:</b> Máscara de CNPJ [**.***.***/****-**]<br/> 
+          - <b>cpf-cnpj:</b> Máscara que intercala automaticamente entre máscara de CPF e CNPJ, considerando o número de caracteres<br/>
+          - <b>cep:</b> Máscara de CEP [**.***-***]<br/>
         `,
         nullable: true
       },{
