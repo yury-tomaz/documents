@@ -1,0 +1,47 @@
+{
+  "name": "Aprovação",
+  "slug": "approval",
+  "title": "Aprovar PO",
+  "type": "slide-over",
+  "index": 1,
+  "actions": [
+    {
+      "label": "Aprovar",
+      "target": "approval",
+      "type": "primary",
+      "key": "approve"
+    },
+    {
+      "label": "Reprovar",
+      "type": "danger",
+      "key": "reprove",
+      "confirm": {
+        "title": "Confirmar Reprovação",
+        "target": "reprove",
+        "rules": ["reprove/reason"],
+        "items": [
+          {
+            "type": "textarea",
+            "label": "Deseja reprovar essa ordem?",
+            "placeholder": "Digite o motivo da reprovação...",
+            "key": "reprove/reason"
+          }
+        ],
+        "actions": [
+          {
+            "label": "Sim",
+            "type": "primary",
+            "key": "reprove/confirm",
+            "confirmation": true
+          },
+          {
+            "label": "Não",
+            "type": "light",
+            "key": "reprove/deny",
+            "confirmation": false
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "name": "Solicitação",
+  "slug": "solicitation",
+  "title": "Nova Solicitação",
+  "type": "slide-over",
+  "index": 0,
+  "rules": {
+    "requireds": ["cost-center","projects","type","form"]
+  },
+  "target": "approval",
+  "action_button": {
+    "label": "Cadastrar",
+    "type": "primary"
+  },
+  "items": [
+    {
+      "key": "cost-center",
+      "type": "select",
+      "label": "Selecione o Centro de Custo",
+      "placeholder": "Centro de Custo",
+      "options": [
+        {"value": "operacao-valet", "name": "Operacao Valet"}
+      ],
+      "required": true
+    },
+    {
+      "key": "projects",
+      "type": "select",
+      "label": "Selecione o Projeto",
+      "placeholder": "Projetos",
+      "options": [
+        {"value": "soimpex", "name":"SOIMPEX"}
+      ],
+      "required": true
+    },
+    {
+      "key": "type",
+      "type": "radio",
+      "options": [
+        {"value": "servicos", "name": "Serviços"}
+      ],
+      "required": true
+    },
+    {
+      "key": "form",
+      "type": "file",
+      "label": "Upload do Formulário"
+    },
+    {
+      "key": "supplier",
+      "type": "group-collapse",
+      "label": "Dados do Fornecedor",
+      "items": [
+        {
+          "type": "text",
+          "mask": "email",
+          "label": "Email",
+          "placeholder": "Digite o email do fornecedor",
+          "key": "supplier/email"
+        },
+        {
+          "type": "text",
+          "label": "Nome",
+          "placeholder": "Digite o nome do fonecedor",
+          "key": "supplier/name"
+        },
+        {
+          "type": "text",
+          "label": "Contato",
+          "placeholder": "Digite o nome do contato",
+          "key": "supplier/contact"
+        }
+      ]
+    }
+  ]
+}

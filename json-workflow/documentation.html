@@ -8,20 +8,13 @@
   <script>
     tailwind.config = {
       darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {}
-        }
-      }
+      theme: { extend: { colors: {} } }
     }
-  </script>
-  <script>
-    // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-    if(localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    let theme = localStorage.getItem('theme');
+    if(theme === 'dark' || ( !theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
     }
+    else document.documentElement.classList.remove('dark')
   </script>
   <style type="text/tailwindcss">
     @layer utilities {
@@ -54,7 +47,7 @@
     /* END:: HANDLE SCROLL ==========================+========= */
   </style>
 </head>
-<body class="dark p-0 m-0">
+<body class="p-0 m-0">
   <div class="bg-white dark:bg-slate-900 min-h-screen py-10">
     <div class="container mx-auto px-4">
       <div class="relative">
@@ -95,7 +88,7 @@
           Os workflows dinâmicos terão sua configuração definida por arquivos json descritos na estrutura a seguir, onde as ordens de etapas, conteúdos e regras são definidas pelo usuário.
         </p>
 
-        <div class="text-xs font-mono text-gray-500 dark:text-gray-400 border border-gray-500 rounded-lg p-3 mb-6">
+        <div class="text-xs font-mono text-gray-500 bg-gray-100 dark:bg-gray-800 dark:text-gray-400 border border-gray-500 rounded-lg p-3 mb-6">
           <span>&lt;nome_do_módulo&gt;</span><br/>
           ---------------- <span>&lt;etapa.json&gt;</span>
         </div>
@@ -105,7 +98,7 @@
         <div class="flex flex-col lg:flex-row gap-4">
           <div class="relative overflow-x-auto" id="table-step">
             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-              <thead class="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <thead class="text-xs text-gray-700 bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" class="px-6 py-3" colspan="2">
                     <span class="uppercase">Step</span><br/>
@@ -132,7 +125,7 @@
           <div>
             <div class="relative overflow-x-auto mb-4" id="table-step-rules">
               <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
                     <th scope="col" class="px-6 py-3" colspan="2">
                       <span class="uppercase">Step / Rules</span><br/>
@@ -158,7 +151,7 @@
     
             <div class="relative overflow-x-auto my-4" id="table-step-actions">
               <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
                     <th scope="col" class="px-6 py-3" colspan="2">
                       <span class="uppercase">Step / Actions</span><br/>
@@ -188,7 +181,7 @@
 
         <div class="relative overflow-x-auto mb-4 lg:mt-4" id="table-step-items">
           <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead class="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col" class="px-6 py-3" colspan="2">
                   <span class="uppercase">Step / Items</span><br/>
@@ -229,15 +222,14 @@
     ];
 
     function handleToggleDarkMode(){
-      if($('body').hasClass('dark')){
+      if(Array.from(document.documentElement.classList).includes('dark')){
         localStorage.setItem('theme', 'light');
-        $('body').removeClass('dark')
+        document.documentElement.classList.remove('dark')
       }else{
         localStorage.setItem('theme', 'dark');
-        $('body').addClass('dark')
+        document.documentElement.classList.add('dark')
       }
     }
-
 
     $(function(){
       initTableSteps();
