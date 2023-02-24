@@ -91,7 +91,10 @@
 
         <div class="text-xs font-mono text-gray-500 bg-gray-100 dark:bg-gray-800 dark:text-gray-400 border border-gray-500 rounded-lg p-3 mb-6">
           <span>&lt;nome_do_módulo&gt;</span><br/>
-          ---------------- <span>&lt;etapa.json&gt;</span>
+          ---------------- <span>&lt;etapa&gt;</span><br/>
+          ------------------------- <span>&lt;v0003@edition_etapa.json&gt;</span><br/>
+          ------------------------- <span>&lt;v0002_etapa.json&gt;</span><br/>
+          ------------------------- <span>&lt;v0001_etapa.json&gt;</span>
         </div>
       </div>
 
@@ -353,16 +356,13 @@
       },{
         key: 'target',
         description: `
-          Slug da etapa para qual irá redirecionar<br/>
-          Obrigatório quando não há confirmação
-        `,
-        nullable: true
+          Slug da etapa para qual irá redirecionar
+        `
       },{
         key: 'confirm',
         description: `
           Confirmar ação. Estrutura semelhante ao json da etapa com:<br/>
           - title (título que aparece no modal de confirmação)<br/>
-          - target<br/>
           - rules<br/>
           - items (caso queira adicionar algum input à confirmação. Mesmo padrão de <a href="#table-step-items" class="underline text-blue-500">Step / Items</a>)<br/>
           - actions (configuração dos botões de confirmação. Mesmo padrão de <a href="#table-step-items" class="underline text-blue-500">Step / Actions</a>, porém os botões terão a prop boleana <b>confirmation</b>, que retornará se a confirmação foi aceita ou negada)
