@@ -306,8 +306,16 @@
           </div>
         `
       },{
-        key: 'index',
-        description: 'Indice da ordem em que a etapa se encontra no fluxo'
+        key: 'position',
+        description: 'Posição x e y da etapa no fluxo'
+      },{
+        key: 'target_mode',
+        description: `
+          Tipo de destino da etapa:<br/>
+          - <b>single:</b> Apenas um destino <br/>
+          - <b>multiple:</b> Multiplos destinos <br/>
+          - <b>final:</b> Sem nenhum destino (etapa final)
+        `
       },{
         key: 'target',
         description: `
